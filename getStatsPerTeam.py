@@ -17,6 +17,8 @@ def getStatsForTeam(team, season):
     fg_pct = team_data['FG_PCT']
     fg3_pct = team_data['FG3_PCT']
     ft_pct = team_data['FT_PCT']
+    rebounds = team_data['REB']
+    assists = team_data['AST']
     blocks = team_data['BLK']
     steals = team_data['STL']
     turnovers = team_data['TOV']
@@ -29,9 +31,6 @@ def getStatsForTeam(team, season):
     # Get advanced team stats
     off_rating = advanced_team_data['OFF_RATING']
     def_rating = advanced_team_data['DEF_RATING']
-    ast_to_ratio = advanced_team_data['AST_TO']
-    dreb_pct = advanced_team_data['DREB_PCT']
-    oreb_pct = advanced_team_data['OREB_PCT']
     true_shooting = advanced_team_data['TS_PCT']
 
     # Parse all the data into a single dict
@@ -41,15 +40,14 @@ def getStatsForTeam(team, season):
         'fg_pct': fg_pct,
         'fg3_pct': fg3_pct,
         'ft_pct': ft_pct,
+        'rebounds': rebounds,
+        'assists': assists,
         'blocks': blocks,
         'steals': steals,
         'turnovers': turnovers,
         'plus_minus': plus_minus,
         'off_rating': off_rating,
         'def_rating': def_rating,
-        'ast_to_ratio': ast_to_ratio,
-        'dreb_pct': dreb_pct,
-        'oreb_pct': oreb_pct,
         'true_shooting': true_shooting
     }
 
