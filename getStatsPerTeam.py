@@ -6,10 +6,10 @@ from nba_api.stats.static import teams
 
 teams_dict = getTeamDict(teams.get_teams())
 
-def getStatsForTeam(team, start, end, season):
+def getStatsForTeam(team, season):
     # Use the NBA API to access a dictionary for a team's season which includes basic stats for every team per 100 possessions
     # Allows to nullify 'pace' of different teams for more standardized stats
-    teamInfo = teamdashboardbygeneralsplits.TeamDashboardByGeneralSplits(team_id=teams_dict[team], per_mode_detailed='Per100Possessions', date_from_nullable=start, date_to_nullable=end, season=season)
+    teamInfo = teamdashboardbygeneralsplits.TeamDashboardByGeneralSplits(team_id=teams_dict[team], per_mode_detailed='Per100Possessions', season=season)
     team_data = teamInfo.get_normalized_dict()['OverallTeamDashboard'][0]
 
     # Get basic team stats
@@ -23,7 +23,7 @@ def getStatsForTeam(team, start, end, season):
     plus_minus = team_data['PLUS_MINUS']
 
     # Use the NBA API to access a dictionary for a team's season which includes advanced stats for every team per 100 possessions
-    advancedTeamInfo = teamdashboardbygeneralsplits.TeamDashboardByGeneralSplits(team_id=teams_dict[team], measure_type_detailed_defense='Advanced', date_from_nullable=start, date_to_nullable=end, season=season)
+    advancedTeamInfo = teamdashboardbygeneralsplits.TeamDashboardByGeneralSplits(team_id=teams_dict[team], measure_type_detailed_defense='Advanced', season=season)
     advanced_team_data = advancedTeamInfo.get_normalized_dict()['OverallTeamDashboard'][0]
     
     # Get advanced team stats
@@ -35,7 +35,8 @@ def getStatsForTeam(team, start, end, season):
     true_shooting = advanced_team_data['TS_PCT']
 
     # Parse all the data into a single dict
-    {
+    full_data = {
+        'team_id': teams_dict[team],
         'w_pct': w_pct,
         'fg_pct': fg_pct,
         'fg3_pct': fg3_pct,
@@ -52,6 +53,6 @@ def getStatsForTeam(team, start, end, season):
         'true_shooting': true_shooting
     }
 
+    return full_data
 
-
-getStatsForTeam("Milwaukee Bucks", "10/18/2022", "06/12/2023", "2022-23")
+print(getStatsForTeam("Houston Rockets", "2017-18"))
