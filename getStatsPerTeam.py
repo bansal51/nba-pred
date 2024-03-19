@@ -1,4 +1,4 @@
-# getStatsPerTeam.py - Get a dataframe output of a teams stats for a season
+# getStatsPerTeam.py - Get a dataframe output of a teams basic and advanced stats for a season
 
 from teams import getTeamDict
 from nba_api.stats.endpoints import teamdashboardbygeneralsplits
