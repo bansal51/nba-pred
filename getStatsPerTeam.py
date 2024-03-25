@@ -52,5 +52,3 @@ def getStatsForTeam(team, season):
     }
 
     return full_data
-
-print(getStatsForTeam("Houston Rockets", "2017-18"))
