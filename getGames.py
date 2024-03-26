@@ -1,7 +1,10 @@
 # getGames.py - Get games on a day from a past season or present season
 
-from nba_api.stats.endpoints import leaguegamelog, scoreboard
+from nba_api.stats.endpoints import leaguegamelog, scoreboardv2
 from teams import getTeamDict
+from nba_api.stats.static import teams
+
+team_dict = getTeamDict(teams.get_teams())
 
 # This functions gets all games from a past specified date
 # Return value is a list: index 0 is a dict that holds the matchup and index 1 holds the result of the games
@@ -32,8 +35,37 @@ def pastMatches(date, season):
         
         homeAwayDict.update({homeTeam: awayTeam}) # Adds the current game to the list of all games for the day
 
+    # List is setup so that the victor is whether or not the key of the dict is the winner
     matchupResults = [homeAwayDict, victorList]
     return matchupResults
 
+# This functions gets all games the current specified date
+# Return value is a dict that holds the matchup
+# date format: mm/dd/yyyy; season format: yyyy-yy
+def presentMatches(date):
+    # get the list of the teams and their matchups on a specific date
+    matches = scoreboardv2.ScoreboardV2(league_id='00', game_date=date)
+    matchesDict = matches.get_normalized_dict()
+    matchList = matchesDict["GameHeader"]
 
-print(pastMatches("12/25/22", "2022-23"))
+    homeAwayDict = {}
+    
+    # Loop through all games
+    for match in matchList:
+        # Get the ID of the home and away teams from the matchList
+        homeTeam = ''
+        awayTeam = ''
+        homeTeamID = match["HOME_TEAM_ID"]
+        awayTeamID = match["VISITOR_TEAM_ID"]
+        
+        # Loop through the team dict and find the name of the team based on the team ID
+        for team, teamID in team_dict.items():
+            if homeTeamID == teamID:
+                homeTeam = team
+            if awayTeamID == teamID:
+                awayTeam = team
+        
+        # Insert the pair into the homeAway dict where the key is the home team and the value is the away team
+        homeAwayDict.update({homeTeam:awayTeam})
+    
+    return homeAwayDict
