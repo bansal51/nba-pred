@@ -86,7 +86,6 @@ def createTrainingSet(startYear, startMonth, startDay, endYear, endMonth, endDay
     endDate = date(endYear, endMonth, endDay)
 
     allGames = pd.DataFrame(columns=['Home', 'Away', 'W_PCT', 'FG_PCT', 'FG3_PCT', 'FT_PCT', 'REB', 'AST', 'BLK', 'STL', 'TOV', 'PLUS_MINUS', 'OFF_RATING', 'DEF_RATING', 'TS_PCT', 'Result', 'Date'])
-    startDateFormatted = startDate.strftime("%m/%d/%Y")
 
     for singleDate in dateRange(startDate, endDate):
         currentDate = singleDate.strftime("%m/%d/%Y")
@@ -106,9 +105,59 @@ def createTrainingSet(startYear, startMonth, startDay, endYear, endMonth, endDay
     return allGames
 
 
-print(createTrainingSet(2022, 11, 5, 2022, 11, 8, "2022-23", "10/18/2022"))
+# Creates logistic regression model and tests accuracy
+def performLogisticRegression(data):
+    featureColumns = ['W_PCT', 'FG_PCT', 'FG3_PCT', 'FT_PCT', 'REB', 'AST', 'BLK', 'STL', 'TOV', 'PLUS_MINUS', 'OFF_RATING', 'DEF_RATING', 'TS_PCT']
 
-# both_dict = getMeanAndStDevDicts("10/18/2022", "12/25/2022", "2022-23")
-# mean_dict = both_dict[0]
-# sd_dict = both_dict[1]
-# print(infoToDF(pastMatches("12/25/2022", "2022-23"), mean_dict, sd_dict, "10/18/2022", "12/25/2022", "2022-23"))
+    # Get the features and result of the games
+    X = data[featureColumns]
+    y = data.Result
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True)
+    logreg = LogisticRegression()
+
+    # Fit the model with the train data
+    logreg.fit(X_train, y_train) 
+
+    # Predict the result of the test set and compare it to the actual results
+    y_pred = logreg.predict(X_test)
+    confmatrix = metrics.confusion_matrix(y_test, y_pred)
+
+    # Print out the model information, as well as accuarcy
+    print('Coefficient Information:')
+    for i in range(len(featureColumns)):
+        logregCoefficients = logreg.coef_
+
+        currentFeature = featureColumns[i]
+        currentCoefficient = logregCoefficients[0][i]
+
+        print(currentFeature + ": " + str(currentCoefficient))
+    
+    print('----------------------------------')
+
+    print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+    print("Precision:", metrics.precision_score(y_test, y_pred))
+    print("Recall:", metrics.recall_score(y_test, y_pred))
+
+    print('----------------------------------')
+
+    print('Confusion Matrix:')
+    print(confmatrix)
+
+    return logreg
+
+# Saves the model in a folder
+# filename should end in '.pkl'
+def saveModel(model, filename):
+    with open('C:/Users/Yash/Documents/projects/nba-app/Saved Models/' + filename, 'wb') as file:
+        pickle.dump(model, file)
+
+# Used to generate new logistic regression models
+# Can import the statistics and predictions for each game from a csv file or can be created on their own
+def createModel(startYear, startMonth, startDay, endYear, endMonth, endDay, season, startOfSeason, filename):
+    allGames = createTrainingSet(startYear, startMonth, startDay, endYear, endMonth, endDay, season, startOfSeason)
+
+    logRegModel = performLogisticRegression(allGames)
+
+    if filename:
+        saveModel(logRegModel, filename)
