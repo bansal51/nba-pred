@@ -5,9 +5,9 @@ from getStatsPerTeam import getStatsForTeam
 import statistics
 
 # Finds the league mean for the basic or advanced stat (statType = 'Base'/'Advanced')
-def normalizedMeanForStatistic(season, stat, statType='Base'):
+def normalizedMeanForStatistic(start, end, season, stat, statType='Base'):
     # Get dictionaries with stats for every team
-    completeTeamInfo = leaguedashteamstats.LeagueDashTeamStats(per_mode_detailed='Per100Possessions', measure_type_detailed_defense=statType, season=season)
+    completeTeamInfo = leaguedashteamstats.LeagueDashTeamStats(per_mode_detailed='Per100Possessions', measure_type_detailed_defense=statType, season=season, date_from_nullable=start, date_to_nullable=end, timeout=120)
     completeTeamDict = completeTeamInfo.get_normalized_dict()
     completeTeamList = completeTeamDict['LeagueDashTeamStats']
 
@@ -22,9 +22,9 @@ def normalizedMeanForStatistic(season, stat, statType='Base'):
 
 
 # Finds the standard deviation for the basic or advanced stat (statType = 'Base'/'Advanced')
-def normalizedStdDevForStatistic(season, stat, statType='Base'):
+def normalizedStdDevForStatistic(start, end, season, stat, statType='Base'):
     # Get dictionaries with stats for every team
-    completeTeamInfo = leaguedashteamstats.LeagueDashTeamStats(per_mode_detailed='Per100Possessions', measure_type_detailed_defense=statType, season=season)
+    completeTeamInfo = leaguedashteamstats.LeagueDashTeamStats(per_mode_detailed='Per100Possessions', measure_type_detailed_defense=statType, season=season, date_from_nullable=start, date_to_nullable=end, timeout=120)
     completeTeamDict = completeTeamInfo.get_normalized_dict()
     completeTeamList = completeTeamDict['LeagueDashTeamStats']
 

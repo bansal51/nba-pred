@@ -1,17 +1,14 @@
 # getGames.py - Get games on a day from a past season or present season
 
 from nba_api.stats.endpoints import leaguegamelog, scoreboardv2
-from teams import getTeamDict
-from nba_api.stats.static import teams
-
-team_dict = getTeamDict(teams.get_teams())
+from teams import teams
 
 # This functions gets all games from a past specified date
 # Return value is a list: index 0 is a dict that holds the matchup and index 1 holds the result of the games
 # date format: mm/dd/yyyy; season format: yyyy-yy
 def pastMatches(date, season):
     # get the list of the teams and their matchups on a specific date
-    matches = leaguegamelog.LeagueGameLog(season=season, league_id='00', season_type_all_star='Regular Season', date_from_nullable=date, date_to_nullable=date)
+    matches = leaguegamelog.LeagueGameLog(season=season, league_id='00', season_type_all_star='Regular Season', date_from_nullable=date, date_to_nullable=date, timeout=120)
     matchesDict = matches.get_normalized_dict()
     matchList = matchesDict["LeagueGameLog"]
     
@@ -44,7 +41,7 @@ def pastMatches(date, season):
 # date format: mm/dd/yyyy; season format: yyyy-yy
 def presentMatches(date):
     # get the list of the teams and their matchups on a specific date
-    matches = scoreboardv2.ScoreboardV2(league_id='00', game_date=date)
+    matches = scoreboardv2.ScoreboardV2(league_id='00', game_date=date, timeout=120)
     matchesDict = matches.get_normalized_dict()
     matchList = matchesDict["GameHeader"]
 
@@ -59,7 +56,7 @@ def presentMatches(date):
         awayTeamID = match["VISITOR_TEAM_ID"]
         
         # Loop through the team dict and find the name of the team based on the team ID
-        for team, teamID in team_dict.items():
+        for team, teamID in teams.items():
             if homeTeamID == teamID:
                 homeTeam = team
             if awayTeamID == teamID:

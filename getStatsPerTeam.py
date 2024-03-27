@@ -1,15 +1,12 @@
 # getStatsPerTeam.py - Get a dataframe output of a teams basic and advanced stats for a season
 
-from teams import getTeamDict
+from teams import teams
 from nba_api.stats.endpoints import teamdashboardbygeneralsplits
-from nba_api.stats.static import teams
 
-teams_dict = getTeamDict(teams.get_teams())
-
-def getStatsForTeam(team, season):
+def getStatsForTeam(team, start, end, season):
     # Use the NBA API to access a dictionary for a team's season which includes basic stats for every team per 100 possessions
     # Allows to nullify 'pace' of different teams for more standardized stats
-    teamInfo = teamdashboardbygeneralsplits.TeamDashboardByGeneralSplits(team_id=teams_dict[team], per_mode_detailed='Per100Possessions', season=season)
+    teamInfo = teamdashboardbygeneralsplits.TeamDashboardByGeneralSplits(team_id=teams[team], per_mode_detailed='Per100Possessions', season=season, date_from_nullable=start, date_to_nullable=end, timeout=120)
     team_data = teamInfo.get_normalized_dict()['OverallTeamDashboard'][0]
 
     # Get basic team stats
@@ -25,7 +22,7 @@ def getStatsForTeam(team, season):
     plus_minus = team_data['PLUS_MINUS']
 
     # Use the NBA API to access a dictionary for a team's season which includes advanced stats for every team per 100 possessions
-    advancedTeamInfo = teamdashboardbygeneralsplits.TeamDashboardByGeneralSplits(team_id=teams_dict[team], measure_type_detailed_defense='Advanced', season=season)
+    advancedTeamInfo = teamdashboardbygeneralsplits.TeamDashboardByGeneralSplits(team_id=teams[team], measure_type_detailed_defense='Advanced', season=season, date_from_nullable=start, date_to_nullable=end, timeout=120)
     advanced_team_data = advancedTeamInfo.get_normalized_dict()['OverallTeamDashboard'][0]
     
     # Get advanced team stats
@@ -35,20 +32,20 @@ def getStatsForTeam(team, season):
 
     # Parse all the data into a single dict
     full_data = {
-        'team_id': teams_dict[team],
-        'w_pct': w_pct,
-        'fg_pct': fg_pct,
-        'fg3_pct': fg3_pct,
-        'ft_pct': ft_pct,
-        'rebounds': rebounds,
-        'assists': assists,
-        'blocks': blocks,
-        'steals': steals,
-        'turnovers': turnovers,
-        'plus_minus': plus_minus,
-        'off_rating': off_rating,
-        'def_rating': def_rating,
-        'true_shooting': true_shooting
+        'TEAM_ID': teams[team],
+        'W_PCT': w_pct,
+        'FG_PCT': fg_pct,
+        'FG3_PCT': fg3_pct,
+        'FT_PCT': ft_pct,
+        'REB': rebounds,
+        'AST': assists,
+        'BLK': blocks,
+        'STL': steals,
+        'TOV': turnovers,
+        'PLUS_MINUS': plus_minus,
+        'OFF_RATING': off_rating,
+        'DEF_RATING': def_rating,
+        'TS_PCT': true_shooting
     }
 
     return full_data
